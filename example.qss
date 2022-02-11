@@ -1,0 +1,13 @@
+
+QTabWidget:pane {
+    background-color:  #333;
+    color:  #ddd;
+}
+
+QPushButton {
+    background-color:  #444;
+}
+
+QPushButton:pressed {
+    background-color:  $55f;
+}
