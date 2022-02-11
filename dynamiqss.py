@@ -14,8 +14,8 @@ def read_variables():
     data = []
     readingInProgress = False
 
-    with open(dqss_file) as qss:
-        for line in qss:
+    with open(dqss_file) as dqss:
+        for line in dqss:
             if variable_block_end in line:
                 readingInProgress = False
             if readingInProgress:
@@ -32,7 +32,7 @@ def create_dictionary():
     for variable in read_variables():
         split_variable = variable.split(':')
         key = split_variable[0]
-        value = split_variable[-1].replace(';', '')
+        value = split_variable[-1].replace(';', '').strip()
         data[key] = value
 
     return data
@@ -41,10 +41,10 @@ def create_dictionary():
 def replace_variables():
     dictionary = create_dictionary()
 
-    with open(dqss_file) as qss, open(qss_output_path, 'a') as output:
+    with open(dqss_file) as dqss, open(qss_output_path, 'w') as output:
         dqss_text_block = False
 
-        for line in qss:
+        for line in dqss:
             if variable_block_start in line:
                 dqss_text_block = True
 
@@ -55,15 +55,13 @@ def replace_variables():
             if dqss_text_block:
                 continue
 
-            line_written = False
+            current_line = line
 
             for key, value in dictionary.items():
-                if key in line:
-                    output.write(line.replace(key, value))
-                    line_written = True
+                if key in current_line:
+                    current_line = current_line.replace(key, value)
 
-            if not line_written:
-                output.write(line)
+            output.write(current_line)
 
 
 if __name__ == "__main__":
