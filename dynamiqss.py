@@ -4,10 +4,16 @@ import os
 import argparse
 
 dqss_file = ""
-qss_output_path = ""
+qss_file = ""
 
 variable_block_start = '@variables'
 variable_block_end = '@endvariables'
+
+generation_info = '\
+/*================================================================================\n\
+  This file was compiled using Dynamiqss.\n\
+  For more information, check out https://github.com/kostoskistefan/dynamiqss\n\
+  ================================================================================*/\n'
 
 
 def read_variables():
@@ -32,7 +38,7 @@ def create_dictionary():
     for variable in read_variables():
         split_variable = variable.split(':')
         key = split_variable[0]
-        value = split_variable[-1].replace(';', '').strip()
+        value = split_variable[-1].split(';')[0].strip()
         data[key] = value
 
     return data
@@ -41,8 +47,10 @@ def create_dictionary():
 def replace_variables():
     dictionary = create_dictionary()
 
-    with open(dqss_file) as dqss, open(qss_output_path, 'w') as output:
+    with open(dqss_file) as dqss, open(qss_file, 'w') as output:
         dqss_text_block = False
+
+        output.write(generation_info);
 
         for line in dqss:
             if variable_block_start in line:
@@ -75,11 +83,11 @@ if __name__ == "__main__":
         raise ValueError("Input source file must a dqss file.")
 
     dqss_file = args.input
-    qss_output_path = args.output
+    qss_file = args.output
  
-    if not qss_output_path.endswith('.qss'):
+    if not qss_file.endswith('.qss'):
         filename = os.path.basename(dqss_file)
         output_file = os.path.splitext(filename)[0] + '.qss'
-        qss_output_path = qss_output_path + output_file
+        qss_file = qss_file + output_file
     
     replace_variables()
